@@ -96,19 +96,16 @@
 			if($this->_key_field == 'unknown')
 				die(get_class($this) .' has no primary key field set.');
 			
-			if(!method_exists($this, 'record_construct'))
-				die('Cannot find the '. get_class($this) .' record constructor (record_construct).');
-			if(!method_exists($this, 'record_destruct'))
-				die('Cannot find the '. get_class($this) .' record destructor (record_destruct).');
-			
-			$this->record_construct();
+			if(method_exists($this, 'record_construct'))
+				$this->record_construct();
 		}
 		
 		
 		function __destruct()
 		{
 			// Call our child destructor to perform any cleanup.
-			$this->record_destruct();
+			if(method_exists($this, 'record_destruct'))
+				$this->record_destruct();
 		}
 		
 		
@@ -186,6 +183,10 @@
 		 */
 		function discover()
 		{
+			if(!Config::get('model_table_discovery')) {
+				return;
+			}
+			
 			$res = Database::query("show columns in `$this->_table_name`");
 			
 			while($row = Database::fetch_assoc($res))
@@ -542,6 +543,55 @@
 				
 				Memcache::set($cache_key, '');
 			}
+		}
+		
+		
+		/**
+		 * find:
+		 * Locates records in this table meeting the criteria supplied in the
+		 * first argument (an associative array of column names and their expected values).
+		 */
+		static function find($class_name, $table_name, $criteria, $sort = false)
+		{
+			$where_bits = array();
+			foreach($criteria as $column => $value)
+			{
+				$value = addslashes($value);
+				$where_bits[] = "`$column` = '$value'";
+			}
+			
+			$q = "select * from `$table_name` where ". implode(' and ', $where_bits);
+			
+			if($sort && !is_array($sort)) {
+				$sort = array($sort);
+			}
+			
+			if($sort)
+			{
+				$sort_bits = array();
+				foreach($sort as $field)
+					$sort_bits[] = $field;
+				
+				$q .= ' order by '. implode(', ', $sort_bits);
+			}
+			
+			$set = Database::query($q);
+			if(!$set)
+				return false;
+			
+			$results = array();
+			while($row = Database::fetch_assoc($set)) {
+				$results[] = new $class_name($row);
+			}
+			
+			if(count($results) == 0) {
+				$results = false;
+			}
+			elseif(count($results) == 1) {
+				$results = $results[0];
+			}
+			
+			return $results;
 		}
 	}
 	

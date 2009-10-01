@@ -4,7 +4,7 @@
 	{
 		private $_root;
 		private $_file;
-		private $_variables;
+		private $_variables = array();
 		
 		function __construct($file = "")
 		{
@@ -19,15 +19,21 @@
 		
 		function display($file = "")
 		{
-			if($file)
+			if($file) {
 				$this->_file = $file;
+			}
+			
+			if(!preg_match('/\.(php|html|tpl|tmpl)$/i', $this->_file)) {
+				$this->_file .= '.php';
+			}
 			
 			$file_path = $this->_root .'/'. $this->_file;
 			
 			if(file_exists($file_path))
 			{
-				foreach($this->_variables as $key => $value)
+				foreach($this->_variables as $key => $value) {
 					$$key = $value;
+				}
 				
 				include($file_path);
 			}

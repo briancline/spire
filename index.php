@@ -23,6 +23,7 @@
 	include(CORE_ROOT.'/library.php');
 	include(CORE_ROOT.'/model.php');
 	include(CORE_ROOT.'/view.php');
+	include(CORE_ROOT.'/jsonresponse.php');
 	
 	// Include libraries
 	include(LIBRARY_ROOT.'/config.php');
@@ -39,9 +40,9 @@
 		$model_path = MODEL_ROOT.'/'.$class_name.'.php';
 		$lib_path = LIBRARY_ROOT.'/'.$class_name.'.php';
 		
-		if(file_exists($lib_path))
+		if(Config::get('library_auto_discovery') && file_exists($lib_path))
 			include($lib_path);
-		elseif(file_exists($model_path))
+		elseif(Config::get('model_auto_discovery') && file_exists($model_path))
 			include($model_path);
 	}
 	
