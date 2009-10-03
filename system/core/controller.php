@@ -6,28 +6,28 @@
 		{
 		}
 		
-		function postedData()
+		protected function postedData()
 		{
 			return ($_POST && is_array($_POST) && count($_POST) > 0);
 		}
 		
-		function redirect($url)
+		protected function redirect($url)
 		{
 			header('Location: '. $url);
 			exit;
 		}
 		
-		function redirectToReferrer()
+		protected function redirectToReferrer()
 		{
 			return $this->redirect($_SERVER['HTTP_REFERER']);
 		}
 		
-		function getSecureSiteUri($path = '', $subdomain = '')
+		protected function getSecureSiteUri($path = '', $subdomain = '')
 		{
 			return $this->getSiteUri($path, $subdomain, true);
 		}
 		
-		function getSiteUri($path = '', $subdomain = '', $isSecure = false)
+		protected function getSiteUri($path = '', $subdomain = '', $isSecure = false)
 		{
 			if($subdomain != '') {
 				$uri = 'http://'. $subdomain .'.'. Config::get('domain_name');
@@ -54,7 +54,7 @@
 		/********************************************************************************
 		 *** POST-BASED JSON METHODS ****************************************************
 		 ********************************************************************************/
-		function getJsonPostRequest()
+		protected function getJsonPostRequest()
 		{
 			$obj = json_decode($_POST['obj']);
 			
@@ -72,7 +72,7 @@
 			return $obj;
 		}
 		
-		function sendJsonRequest($url, $req = '', $req_field_name = 'obj')
+		protected function sendJsonRequest($url, $req = '', $req_field_name = 'obj')
 		{
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -89,13 +89,13 @@
 			return json_decode($resp);
 		}
 		
-		function sendJsonResponse($obj)
+		protected function sendJsonResponse($obj)
 		{
 			header('Content-type: application/x-javascript');
 			echo(json_encode($obj));
 		}
 		
-		function sendJsonError($message)
+		protected function sendJsonError($message)
 		{
 			$resp = new JsonResponse();
 			$resp->setError($message);

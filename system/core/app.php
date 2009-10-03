@@ -133,7 +133,7 @@
 			 * the ability to intercept and handle missing methods. Don't die
 			 * if we can't find the method in a controller where __call is defined.
 			 */
-			if(!method_exists($obj, $method) && !method_exists($obj, '__call'))
+			if((!method_exists($obj, $method) && !method_exists($obj, '__call')) || !is_callable(array($obj, $method)))
 				die("Controller method [$class][$method] does not exist.");
 			
 			call_user_func_array(array($obj, $method), $this->request_arguments);
