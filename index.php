@@ -24,6 +24,7 @@
 	include(CORE_ROOT.'/model.php');
 	include(CORE_ROOT.'/view.php');
 	include(CORE_ROOT.'/jsonresponse.php');
+	include(CORE_ROOT.'/appcontroller.php');
 	
 	// Include libraries
 	include(LIBRARY_ROOT.'/config.php');
