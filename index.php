@@ -16,6 +16,7 @@
 	
 	// Include global and database configuration
 	include(CONFIG_ROOT.'/global.php');
+	include(CONFIG_ROOT.'/routing.php');
 	
 	// Include core classes
 	include(CORE_ROOT.'/app.php');
@@ -28,11 +29,14 @@
 	
 	// Include libraries
 	include(LIBRARY_ROOT.'/config.php');
+	include(LIBRARY_ROOT.'/routing.php');
 	include(LIBRARY_ROOT.'/debug.php');
 	include(LIBRARY_ROOT.'/datetime.php');
 	include(LIBRARY_ROOT.'/database.php');
 	include(LIBRARY_ROOT.'/memcache.php');
 	include(LIBRARY_ROOT.'/string.php');
+	include(LIBRARY_ROOT.'/array.php');
+	include(LIBRARY_ROOT.'/validation.php');
 	
 	// Include models as they are required
 	function __autoload($class_name)

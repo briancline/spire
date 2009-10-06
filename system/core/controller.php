@@ -6,6 +6,10 @@
 		{
 		}
 		
+		function __destruct()
+		{
+		}
+		
 		protected function postedData()
 		{
 			return ($_POST && is_array($_POST) && count($_POST) > 0);
