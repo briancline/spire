@@ -58,46 +58,47 @@
 		 */
 		function prepare_request()
 		{
-			$this->request = $_SERVER['REQUEST_URI'];
+			$this->request = $_SERVER['PATH_INFO'];
 			$this->query_string = $_SERVER['QUERY_STRING'];
+			
+			if($this->request && !preg_match(Config::get('url_chars'), $this->request)) {
+				return false;
+			}
 			
 			// Remove the length of the query string off the end of the
 			// request. +1 to the query string length to also remove the ?
-			if($this->query_string)
-				$this->request = substr($this->request, 0, (strlen($this->query_string)+1)*-1);
-			
-			$url = Config::get('url');
-			$url_chars = Config::get('url_chars');
-			$path = parse_url($url, PHP_URL_PATH);
-			
-			// Get rid of the $path if present at the start of our request
-			if($path != '' && $path == substr($this->request, 0, strlen($path)))
-				$this->request = substr($this->request, strlen($path));
-			
-			if($this->request && !preg_match($url_chars, $this->request))
-				return false;
+			if(!empty($this->query_string) && false !== strpos($this->request, '?')) {
+				$this->request = substr($this->request, 0, (strlen($this->query_string) + 1) * -1);
+			}
 			
 			// Trash any leading slashes
-			if($this->request[0] == '/')
+			if($this->request[0] == '/') {
 				$this->request = substr($this->request, 1);
+			}
+			
+			// Reroute this URI if necessary
+			$this->request = Routing::determineFinalRoute($this->request);
 			
 			$this->request = explode('/', $this->request);
 			$this->request_length = count($this->request);
 			
 			// Trash the index.php match
-			if($this->request[0] == 'index.php')
+			if($this->request[0] == 'index.php') {
 				array_shift($this->request);
+			}
 			
 			// Grab the controller, method and arguments
 			$this->request_controller = array_shift($this->request);
 			$this->request_method = array_shift($this->request);
 			$this->request_arguments = $this->request;
 			
-			if(!$this->request_controller)
+			if(!$this->request_controller) {
 				$this->request_controller = Config::get('default_controller');
+			}
 			
-			if(!$this->request_method)
+			if(!$this->request_method) {
 				$this->request_method = Config::get('default_method');
+			}
 			
 			return true;
 		}
@@ -109,19 +110,22 @@
 		function dispatch()
 		{
 			// Don't bother dispatching if we run from CLI
-			if(empty($_SERVER['REQUEST_URI']))
+			if(empty($_SERVER['REQUEST_URI'])) {
 				return;
+			}
 			
 			// Prepare the request before attempting to dispatch.
-			if(!$this->prepare_request())
+			if(!$this->prepare_request()) {
 				die("Could not properly prepare the request.");
+			}
 			
 			$class = $this->request_controller;
 			$method = $this->request_method;
 			$class_file = CONTROLLER_ROOT.'/'.$class.'.php';
 			
-			if(!file_exists($class_file))
+			if(!file_exists($class_file)) {
 				die("Controller [$class] does not exist.");
+			}
 			
 			// We've proven it exists and the user wants it, include
 			// the controller class and instantiate it.
@@ -133,8 +137,9 @@
 			 * the ability to intercept and handle missing methods. Don't die
 			 * if we can't find the method in a controller where __call is defined.
 			 */
-			if((!method_exists($obj, $method) && !method_exists($obj, '__call')) || !is_callable(array($obj, $method)))
+			if((!method_exists($obj, $method) && !method_exists($obj, '__call')) || !is_callable(array($obj, $method))) {
 				die("Controller method [$class][$method] does not exist.");
+			}
 			
 			call_user_func_array(array($obj, $method), $this->request_arguments);
 		}
