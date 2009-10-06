@@ -551,13 +551,27 @@
 		 * Locates records in this table meeting the criteria supplied in the
 		 * first argument (an associative array of column names and their expected values).
 		 */
-		static function find($class_name, $table_name, $criteria, $sort = false)
+		static function find($class_name, $table_name, $criteria, $sort = false, $limitStart = false, $limitEnd = false)
 		{
 			$where_bits = array();
 			foreach($criteria as $column => $value)
 			{
+				$operand = '=';
+				if(preg_match('/^(.+):(.+)$/', $column, $bits)) {
+					$column = addslashes($bits[1]);
+					$operandWord = $bits[2];
+					
+					switch($operandWord) {
+						case 'gt':   $operand = '>';    break;
+						case 'gte':  $operand = '>=';   break;
+						case 'lt':   $operand = '<';    break;
+						case 'lte':  $operand = '<=';   break;
+						case 'like': $operand = 'LIKE'; break;
+					}
+				}
+				
 				$value = addslashes($value);
-				$where_bits[] = "`$column` = '$value'";
+				$where_bits[] = "`$column` $operand '$value'";
 			}
 			
 			$q = "select * from `$table_name` where ". implode(' and ', $where_bits);
@@ -570,9 +584,29 @@
 			{
 				$sort_bits = array();
 				foreach($sort as $field)
+				{
+					if(preg_match('/^(.*):(.*)$/', $field, $bits))
+					{
+						$order = strtoupper($bits[2]);
+						if($order != 'DESC' && $order != 'ASC') {
+							$order = '';
+						}
+						
+						$field = "`{$bits[1]}` {$order}";
+					}
+					else {
+						$field = "`$field`";
+					}
+					
 					$sort_bits[] = $field;
+				}
 				
 				$q .= ' order by '. implode(', ', $sort_bits);
+			}
+			
+			if($limitStart !== false && is_numeric($limitStart) && 
+					$limitEnd !== false && is_numeric($limitEnd)) {
+				$q .= " limit $limitStart, $limitEnd";
 			}
 			
 			$set = Database::query($q);
