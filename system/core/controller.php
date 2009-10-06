@@ -54,9 +54,9 @@
 		/********************************************************************************
 		 *** POST-BASED JSON METHODS ****************************************************
 		 ********************************************************************************/
-		protected function getJsonPostRequest()
+		protected function getJsonPostRequest($req_field_name = 'obj')
 		{
-			$obj = json_decode($_POST['obj']);
+			$obj = json_decode($_POST[$req_field_name]);
 			
 			if(!is_object($obj))
 				return false;
