@@ -187,26 +187,37 @@
 				return;
 			}
 			
-			$res = Database::query("show columns in `$this->_table_name`");
-			
-			while($row = Database::fetch_assoc($res))
+			if($cache = Database::getCachedTableMetaData($this->_table_name))
 			{
-				$field_name = $row['Field'];
-				$field_type = $row['Type'];
-				$field_default = $row['Default'];
+				$this->_field_types = $cache->types;
+				$this->_field_defaults = $cache->defaults;
+			}
+			else
+			{
+				$res = Database::query("show columns in `$this->_table_name`");
 				
-				/**
-				 * We don't want to set default values to a string of 'NULL',
-				 * just an empty string.
-				 */
-				if($field_default == 'NULL')
-					$field_default = '';
+				while($row = Database::fetch_assoc($res))
+				{
+					$field_name = $row['Field'];
+					$field_type = $row['Type'];
+					$field_default = $row['Default'];
+					
+					/**
+					 * We don't want to set default values to a string of 'NULL',
+					 * just an empty string.
+					 */
+					if($field_default == 'NULL')
+						$field_default = '';
+					
+					$this->_field_types[$field_name] = $field_type;
+					$this->_field_defaults[$field_name] = $field_default;
+				}
 				
-				$this->_field_types[$field_name] = $field_type;
-				$this->_field_defaults[$field_name] = $field_default;
-				
-				// Go ahead and set this column's default value in memory.
-				$this->$field_name = $field_default;
+				Database::cacheTableMetaData($this->_table_name, $this->_field_types, $this->_field_defaults);
+			}
+
+			foreach($this->_field_defaults as $fieldName => $defaultValue) {
+				$this->$fieldName = $defaultValue;
 			}
 		}
 		

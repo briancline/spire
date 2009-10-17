@@ -2,6 +2,25 @@
 
 	class Database
 	{
+		private static $tableMetaDataCache = array();
+		
+		
+		static function datetime($ts_or_date = -1, $secs_delta = 0)
+		{
+			$format = 'Y-m-d H:i:s';
+			$ts = 0;
+			
+			if(is_numeric($ts_or_date))
+				$ts = $ts_or_date + $secs_delta;
+			elseif($ts_or_date != -1)
+				$ts = strtotime($ts_or_date) + $secs_delta;
+			else
+				$ts = time();
+			
+			return date($format, $ts);
+		}
+		
+		
 		function connect($host, $user, $pass, $database = '')
 		{
 			$conn = mysql_connect($host, $user, $pass);
@@ -125,18 +144,37 @@
 				mysql_close();
 		}
 		
-		static function datetime($ts_or_date, $secs_delta = 0)
+		public function cacheTableMetaData($tableName, $types, $defaults)
 		{
-			$format = 'Y-m-d H:i:s';
-			$ts = 0;
-			
-			if(is_numeric($ts_or_date))
-				$ts = $ts_or_date + $secs_delta;
-			else
-				$ts = strtotime($ts_or_date) + $secs_delta;
-			
-			return date($format, $ts);
+			$cacheEntry = new DatabaseTableMetaCacheEntry($types, $defaults);
+
+			$key = sprintf('%s:%s', Config::get('db_database'), $tableName);
+			self::$tableMetaDataCache[$key] = $cacheEntry;
+		}
+
+		public function getCachedTableMetaData($tableName)
+		{
+			$key = sprintf('%s:%s', Config::get('db_database'), $tableName);
+
+			if(!isset(self::$tableMetaDataCache[$key])) {
+				return false;
+			}
+
+			return self::$tableMetaDataCache[$key];
 		}
 	}
-	
+
+
+	class DatabaseTableMetaCacheEntry
+	{
+		public $types = array();
+		public $defaults = array();
+
+		public function DatabaseTableMetaCacheEntry($types, $defaults)
+		{
+			$this->types = $types;
+			$this->defaults = $defaults;
+		}
+	}
+
 ?>
