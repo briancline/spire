@@ -76,8 +76,8 @@
 		
 		function query_object($query)
 		{
-			$row = Database::query_record($query);
-			return Database::row_to_obj($row);
+			$res = Database::query($query);
+			return mysql_fetch_object($res);
 		}
 		
 		function query_id_array($query, $log = false)
@@ -121,19 +121,6 @@
 		{
 			$row = mysql_fetch_assoc($result);
 			return Database::row_to_obj($row);
-		}
-		
-		function row_to_obj($row)
-		{
-			if(!$row)
-				return false;
-			
-			$obj = new stdClass();
-			
-			foreach($row as $key => $value)
-				$obj->$key = $value;
-				
-			return $obj;
 		}
 		
 		function close($conn = 0)
