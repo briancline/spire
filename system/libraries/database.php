@@ -2,9 +2,6 @@
 
 	class Database
 	{
-		private static $tableMetaDataCache = array();
-		
-		
 		static function datetime($ts_or_date = -1, $secs_delta = 0)
 		{
 			$format = 'Y-m-d H:i:s';
@@ -129,38 +126,6 @@
 				mysql_close($conn);
 			else
 				mysql_close();
-		}
-		
-		public function cacheTableMetaData($tableName, $types, $defaults)
-		{
-			$cacheEntry = new DatabaseTableMetaCacheEntry($types, $defaults);
-
-			$key = sprintf('%s:%s', Config::get('db_database'), $tableName);
-			self::$tableMetaDataCache[$key] = $cacheEntry;
-		}
-
-		public function getCachedTableMetaData($tableName)
-		{
-			$key = sprintf('%s:%s', Config::get('db_database'), $tableName);
-
-			if(!isset(self::$tableMetaDataCache[$key])) {
-				return false;
-			}
-
-			return self::$tableMetaDataCache[$key];
-		}
-	}
-
-
-	class DatabaseTableMetaCacheEntry
-	{
-		public $types = array();
-		public $defaults = array();
-
-		public function DatabaseTableMetaCacheEntry($types, $defaults)
-		{
-			$this->types = $types;
-			$this->defaults = $defaults;
 		}
 	}
 
