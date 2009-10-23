@@ -116,8 +116,7 @@
 		
 		function fetch_object($result)
 		{
-			$row = mysql_fetch_assoc($result);
-			return Database::row_to_obj($row);
+			return mysql_fetch_object($result);
 		}
 		
 		function close($conn = 0)
