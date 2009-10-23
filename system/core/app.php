@@ -124,6 +124,7 @@
 			$class_file = CONTROLLER_ROOT.'/'.$class.'.php';
 			
 			if(!file_exists($class_file)) {
+				header($_SERVER['SERVER_PROTOCOL'] .' 404 Not Found');
 				die("Controller [$class] does not exist.");
 			}
 			
@@ -138,6 +139,7 @@
 			 * if we can't find the method in a controller where __call is defined.
 			 */
 			if((!method_exists($obj, $method) && !method_exists($obj, '__call')) || !is_callable(array($obj, $method))) {
+				header($_SERVER['SERVER_PROTOCOL'] .' 404 Not Found');
 				die("Controller method [$class][$method] does not exist.");
 			}
 			
