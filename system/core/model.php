@@ -41,39 +41,18 @@
 				{
 					// We received an ID, so check the database for it
 					
-					$row = 0;
+					$res = Database::query(
+						"select * ".
+						"from `". static::$_table_name ."` ".
+						"where `". static::$_key_field ."` = '$id'");
 					
-					if($this->using_memcache())
-					{
-						$cache_key = sprintf("DB/%s/%s",
-							static::$_table_name,
-							$id);
-						$ser_record = Memcache::get($cache_key);
-						
-						if($ser_record == '')
-							return false;
-						
-						$row = unserialize($ser_record);
+					if($res && Database::num_rows($res) == 1) {
+						// Fetch the row from the DB.
+						$row = Database::fetch_assoc($res);
 					}
-					
-					// Query the DB if we're not using memcache, or if we are and nothing was returned.
-					if(!is_array($row))
-					{
-						$res = Database::query(
-							"select * ".
-							"from `". static::$_table_name ."` ".
-							"where `". static::$_key_field ."` = '$id'");
-						
-						if($res && Database::num_rows($res) == 1)
-						{
-							// Fetch the row from the DB.
-							$row = Database::fetch_assoc($res);
-						}
-						else
-						{
-							// Nothing found; this empty record remains intact.
-							return false;
-						}
+					else {
+						// Nothing found; this empty record remains intact.
+						return false;
 					}
 				}
 				
@@ -108,12 +87,6 @@
 			// Call our child destructor to perform any cleanup.
 			if(method_exists($this, 'record_destruct'))
 				$this->record_destruct();
-		}
-		
-		
-		function using_memcache()
-		{
-			return Config::get('memcache_enabled');
 		}
 		
 		
@@ -471,17 +444,6 @@
 				Database::query("update `". static::$_table_name ."` set $fields where `$key_name` = '$key_value'", $log);
 				$this->_record_exists = true;
 			}
-
-			if($this->using_memcache())
-			{
-				$field_array = $this->get_assoc();
-				$cache_key = sprintf("DB/%s/%s",
-					static::$_table_name,
-					$this->get_key_value());
-				$cache_data = serialize($field_array);
-				
-				Memcache::set($cache_key, $cache_data);
-			}
 		}
 		
 		
@@ -541,15 +503,6 @@
 				Database::query("delete from `". static::$_table_name ."` where `". static::$_key_field ."` = '$key_value'");
 			
 			$this->_record_exists = false;
-			
-			if($this->using_memcache())
-			{
-				$cache_key = sprintf("DB/%s/%s",
-					static::$_table_name,
-					$key_value);
-				
-				Memcache::set($cache_key, '');
-			}
 		}
 		
 		
