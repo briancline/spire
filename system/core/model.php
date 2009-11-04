@@ -569,6 +569,7 @@
 					$operandWord = $bits[2];
 					
 					switch($operandWord) {
+						case 'ne':   $operand = '!=';   break;
 						case 'gt':   $operand = '>';    break;
 						case 'gte':  $operand = '>=';   break;
 						case 'lt':   $operand = '<';    break;
@@ -611,10 +612,10 @@
 				$q .= ' order by '. implode(', ', $sort_bits);
 			}
 			
-			if($limitStart !== false && is_numeric($limitStart) && $limitStart > 0) {
+			if($limitStart !== false && is_numeric($limitStart)) {
 				$q .= " limit $limitStart";
 				
-				if($limitEnd !== false && is_numeric($limitEnd) && $limitEnd > 0) {
+				if($limitEnd !== false && is_numeric($limitEnd)) {
 					$q .= ", $limitEnd";
 				}
 			}
