@@ -2,8 +2,20 @@
 
 	class Controller
 	{
+		protected $postVars = null;
+		protected $getVars = null;
+
 		function __construct()
 		{
+			$this->postVars = new stdClass();
+			$this->getVars = new stdClass();
+
+			foreach($_POST as $postKey => $postValue) {
+				$this->postVars->$postKey = $postValue;
+			}
+			foreach($_GET as $getKey => $getValue) {
+				$this->getVars->$getKey = $getValue;
+			}
 		}
 		
 		function __destruct()
@@ -12,7 +24,12 @@
 		
 		protected function postedData()
 		{
-			return ($_POST && is_array($_POST) && count($_POST) > 0);
+			return (isset($_POST) && is_array($_POST) && count($_POST) > 0);
+		}
+
+		protected function submittedData()
+		{
+			return (isset($_GET) && is_array($_GET) && count($_GET) > 0);
 		}
 		
 		protected function redirect($url)
