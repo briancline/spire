@@ -512,7 +512,7 @@
 		 * Locates records in this table meeting the criteria supplied in the
 		 * first argument (an associative array of column names and their expected values).
 		 */
-		static function find($criteria = false, $sort = false, $limitStart = false, $limitEnd = false)
+		static function find($criteria = array(), $sort = false, $limitStart = false, $limitEnd = false)
 		{
 			$q = "SELECT * FROM `". static::$_table_name ."`";
 
