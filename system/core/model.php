@@ -512,8 +512,10 @@
 		 * Locates records in this table meeting the criteria supplied in the
 		 * first argument (an associative array of column names and their expected values).
 		 */
-		static function find($criteria, $sort = false, $limitStart = false, $limitEnd = false)
+		static function find($criteria = false, $sort = false, $limitStart = false, $limitEnd = false)
 		{
+			$q = "SELECT * FROM `". static::$_table_name ."`";
+
 			$where_bits = array();
 			foreach($criteria as $column => $value)
 			{
@@ -536,7 +538,9 @@
 				$where_bits[] = "`$column` $operand '$value'";
 			}
 			
-			$q = "select * from `". static::$_table_name ."` where ". implode(' and ', $where_bits);
+			if(!empty($where_bits)) {
+				$q .= " WHERE ". implode(' AND ', $where_bits);
+			}
 			
 			if($sort && !is_array($sort)) {
 				$sort = array($sort);
@@ -563,11 +567,11 @@
 					$sort_bits[] = $field;
 				}
 				
-				$q .= ' order by '. implode(', ', $sort_bits);
+				$q .= ' ORDER BY '. implode(', ', $sort_bits);
 			}
 			
 			if($limitStart !== false && is_numeric($limitStart)) {
-				$q .= " limit $limitStart";
+				$q .= " LIMIT $limitStart";
 				
 				if($limitEnd !== false && is_numeric($limitEnd)) {
 					$q .= ", $limitEnd";
@@ -592,6 +596,45 @@
 			}
 			
 			return $results;
+		}
+
+		/**
+		 * findById:
+		 * Performs a generic search based on the primary key field.
+		 */
+		public static function findById($id, $sort = false, $limitStart = false, $limitEnd = false)
+		{
+			return self::find(array(static::$_key_field => $id), $sort, $limitStart, $limitEnd);
+		}
+
+		/**
+		 * findAll:
+		 * Requests every record in the table, passing the sorting and limiting criteria to
+		 * find(). Returns an array of objects, even if there is only one. If no results were
+		 * returned, returns an empty array.
+		 */
+		public static function findAll($sort = false, $limitStart = false, $limitEnd = false)
+		{
+			return self::findSet(array(), $sort, $limitStart, $limitEnd);
+		}
+
+		/**
+		 * findSet:
+		 * Passes the request to find() and returns the result as an array of objects,
+		 * even if there is only one. If no results were returned, return an empty array.
+		 */
+		public static function findSet($criteria = array(), $sort = false, $limitStart = alse, $limitEnd = false)
+		{
+			$results = self::find($criteria, $sort, $limitStart, $limitEnd);
+
+			if(is_array($results)) {
+				return $results;
+			}
+			elseif($results) {
+				return array($results);
+			}
+
+			return array();
 		}
 	}
 	
