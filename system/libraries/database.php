@@ -2,6 +2,8 @@
 
 	class Database
 	{
+		public static $queryCount = 0;
+		
 		static function datetime($ts_or_date = -1, $secs_delta = 0)
 		{
 			$format = 'Y-m-d H:i:s';
@@ -39,6 +41,7 @@
 		{
 			$res = mysql_query($query);
 			$err = mysql_errno();
+			self::$queryCount++;
 			
 			if($err != 0)
 			{
@@ -46,6 +49,8 @@
 				Debug::critical("[ERROR] ".
 					"I'm sorry, Dave, I'm afraid I can't do that. ".
 					mysql_error());
+				error_log($query);
+				error_log(mysql_error());
 			}
 			elseif($log)
 			{
@@ -107,6 +112,10 @@
 		function num_rows($result)
 		{
 			return mysql_num_rows($result);
+		}
+		
+		function jumpToRow($result, $rowNum) {
+			return mysql_data_seek($result, $rowNum);
 		}
 		
 		function fetch_assoc($result)

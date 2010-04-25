@@ -1,5 +1,6 @@
 <?php
 
+	define('START_TIME', microtime(true));
 	error_reporting(E_ALL);
 	
 	define('ROOT', dirname(__FILE__));

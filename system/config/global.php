@@ -17,6 +17,7 @@
 	$global['memcache_host'] = '127.0.0.1';
 	$global['memcache_port'] = 11211;
 	$global['memcache_timeout'] = 2;
+	$global['memcache_prefix'] = 'mysite:';
 	
 	// Database config
 	$global['db_host'] = 'localhost';
@@ -32,7 +33,7 @@
 	$global['model_table_discovery'] = true;
 	
 	// Detect if we're on the dev site
-	$global['is_dev_site'] = eregi('\/subdomains\/dev\/', dirname(__FILE__));
+	$global['is_dev_site'] = preg_match('#/sub/dev/#', dirname(__FILE__));
 	
 	// Set appropriate variables for test environment
 	if($global['is_dev_site']) {

@@ -9,6 +9,9 @@
 		// Database connection
 		private $db_conn;
 		
+		// Memcached connection
+		private $memcache;
+		
 		// Request URI
 		private $request;
 		private $request_length;
@@ -27,6 +30,15 @@
 			$database = Config::get('db_database');
 			
 			$this->db_conn = Database::connect($host, $user, $pass, $database);
+			
+			if(Config::get('memcache_enabled')) {
+				$this->memcache = new Memcache;
+				$this->memcache->pconnect(
+					Config::get('memcache_host'),
+					Config::get('memcache_port'));
+				Cache::$cache = $this->memcache;
+				Cache::$prefix = Config::get('memcache_prefix');
+			}
 		}
 		
 		/**
@@ -58,8 +70,12 @@
 		 */
 		function prepare_request()
 		{
-			$this->request = $_SERVER['PATH_INFO'];
-			$this->query_string = $_SERVER['QUERY_STRING'];
+			if(isset($_SERVER['PATH_INFO'])) {
+				$this->request = $_SERVER['PATH_INFO'];
+			}
+			else {
+				$this->request = $_SERVER['REQUEST_URI'];
+			}
 			
 			if($this->request && !preg_match(Config::get('url_chars'), $this->request)) {
 				return false;
@@ -67,6 +83,7 @@
 			
 			// Remove the length of the query string off the end of the
 			// request. +1 to the query string length to also remove the ?
+			$this->query_string = $_SERVER['QUERY_STRING'];
 			if(!empty($this->query_string) && false !== strpos($this->request, '?')) {
 				$this->request = substr($this->request, 0, (strlen($this->query_string) + 1) * -1);
 			}

@@ -18,6 +18,7 @@
 		protected static $_exclude_from_update = array();
 		protected static $_insert_timestamp_field = '';
 		protected static $_update_timestamp_field = '';
+		protected static $_cachePrefix = '';
 		
 		protected static $_field_types = array();
 		protected static $_field_defaults = array();
@@ -39,31 +40,45 @@
 				}
 				else
 				{
-					// We received an ID, so check the database for it
-					
-					$res = Database::query(
-						"select * ".
-						"from `". static::$_table_name ."` ".
-						"where `". static::$_key_field ."` = '$id'");
-					
-					if($res && Database::num_rows($res) == 1) {
-						// Fetch the row from the DB.
-						$row = Database::fetch_assoc($res);
+					$row = false;
+					// Check the cache first, if using one
+					if(!empty(static::$_cachePrefix)) {
+						$cacheResult = Cache::get(static::$_cachePrefix . $id);
+						if($cacheResult && is_array($cacheResult)) {
+							$row = $cacheResult;
+						}
 					}
-					else {
-						// Nothing found; this empty record remains intact.
-						return false;
+					
+					// Check the database next
+					if(!$row) {
+						$safeId = mysql_real_escape_string($id);
+						$res = Database::query(
+							"SELECT * ".
+							"FROM `". static::$_table_name ."` ".
+							"WHERE `". static::$_key_field ."` = '$safeId'");
+						
+						if($res && Database::num_rows($res) == 1) {
+							// Fetch the row from the DB.
+							$row = Database::fetch_assoc($res);
+							
+							if(method_exists($this, 'recordLoaded')) {
+								$this->recordLoaded($row);
+							}
+						}
 					}
 				}
 				
-				if(!empty($row))
-				{
+				if(!empty($row)) {
 					// We have data; populate members with it.
 					
 					$this->_record_exists = true;
 					
-					foreach($row as $column => $value)
+					foreach($row as $column => $value) {
 						$this->$column = $value;
+					}
+				}
+				else {
+					return false;
 				}
 			}
 			
@@ -163,10 +178,9 @@
 				return;
 			}
 			
-			$cache_key = static::$_table_name;
-			if(!isset(static::$_field_types[$cache_key]))
+			if(empty(static::$_field_types))
 			{
-				$res = Database::query("show columns in `". static::$_table_name ."`");
+				$res = Database::query("SHOW COLUMNS IN `". static::$_table_name ."`");
 				
 				while($row = Database::fetch_assoc($res))
 				{
@@ -181,12 +195,12 @@
 					if($field_default == 'NULL')
 						$field_default = NULL;
 					
-					static::$_field_types[$cache_key][$field_name] = $field_type;
-					static::$_field_defaults[$cache_key][$field_name] = $field_default;
+					static::$_field_types[$field_name] = $field_type;
+					static::$_field_defaults[$field_name] = $field_default;
 				}
 			}
 
-			foreach(static::$_field_defaults[$cache_key] as $fieldName => $defaultValue) {
+			foreach(static::$_field_defaults as $fieldName => $defaultValue) {
 				$this->$fieldName = $defaultValue;
 			}
 		}
@@ -210,8 +224,13 @@
 				$row = Database::fetch_assoc($res);
 				$this->_record_exists = true;
 				
-				foreach($row as $column => $value)
+				if(method_exists($this, 'recordLoaded')) {
+					$this->recordLoaded($row);
+				}
+				
+				foreach($row as $column => $value) {
 					$this->$column = $value;
+				}
 			}
 			else
 			{
@@ -424,9 +443,17 @@
 					$values .= ", NOW()";
 				}
 				
-				Database::query("insert into `". static::$_table_name ."` ($fields) values ($values)", $log);
+				Database::query("INSERT INTO `". static::$_table_name ."` ($fields) VALUES ($values)", $log);
 				$this->$key_name = Database::insert_id();
 				$this->_record_exists = true;
+				
+				if(!empty(static::$_cachePrefix)) {
+					Cache::dirty(static::$_cachePrefix . $this->getId());
+				}
+				
+				if(method_exists($this, 'recordSaved')) {
+					$this->recordSaved();
+				}
 			}
 			else
 			{
@@ -442,8 +469,16 @@
 					$fields .= '`'. static::$_update_timestamp_field .'` = NOW()';
 				}
 				
-				Database::query("update `". static::$_table_name ."` set $fields where `$key_name` = '$key_value'", $log);
+				Database::query("UPDATE `". static::$_table_name ."` SET $fields WHERE `$key_name` = '$key_value'", $log);
 				$this->_record_exists = true;
+
+				if(!empty(static::$_cachePrefix)) {
+					Cache::dirty(static::$_cachePrefix . $this->getId());
+				}
+				
+				if(method_exists($this, 'recordSaved')) {
+					$this->recordSaved();
+				}
 			}
 		}
 		
@@ -470,7 +505,7 @@
 					$values .= ", NOW()";
 				}
 				
-				Debug::infof('[DB-PREVIEW] insert into `%s` (%s) values (%s)', 
+				Debug::info('[DB-PREVIEW] INSERT INTO `%s` (%s) VALUES (%s)', 
 					static::$_table_name, $fields, $values);
 			}
 			else
@@ -485,7 +520,7 @@
 					$fields .= '`'. static::$_update_timestamp_field .'` = NOW()';
 				}
 				
-				Debug::info("[DB-PREVIEW] update %s set %s where `%s` = '%s'", 
+				Debug::info("[DB-PREVIEW] UPDATE `%s` SET %s WHERE `%s` = '%s'", 
 					static::$_table_name, $fields, $key_name, $key_value);
 			}
 		}
@@ -501,7 +536,11 @@
 			
 			// Perform the delete only if we have a key value for this record.
 			if($key_value != 0)
-				Database::query("delete from `". static::$_table_name ."` where `". static::$_key_field ."` = '$key_value'");
+				Database::query("DELETE FROM `". static::$_table_name ."` WHERE `". static::$_key_field ."` = '$key_value'");
+			
+			if(!empty(static::$_cachePrefix)) {
+				Cache::dirty(static::$_cachePrefix . $this->getId());
+			}
 			
 			$this->_record_exists = false;
 		}
@@ -512,10 +551,10 @@
 		 * Locates records in this table meeting the criteria supplied in the
 		 * first argument (an associative array of column names and their expected values).
 		 */
-		static function find($criteria = array(), $sort = false, $limitStart = false, $limitEnd = false)
+		static function find($criteria = array(), $sort = false, $limitStart = false, $limitEnd = false, $cacheSingleRowOnLoad = false)
 		{
 			$q = "SELECT * FROM `". static::$_table_name ."`";
-
+			
 			$where_bits = array();
 			foreach($criteria as $column => $value)
 			{
@@ -573,7 +612,7 @@
 			if($limitStart !== false && is_numeric($limitStart)) {
 				$q .= " LIMIT $limitStart";
 				
-				if($limitEnd !== false && is_numeric($limitEnd)) {
+				if($limitEnd !== false && is_numeric($limitEnd) && $limitEnd > 0) {
 					$q .= ", $limitEnd";
 				}
 			}
@@ -584,8 +623,10 @@
 			
 			$class_name = get_called_class();
 			$results = array();
+			$lastRow = false;
 			while($row = Database::fetch_assoc($set)) {
 				$results[] = new $class_name($row);
+				$lastRow = $row;
 			}
 			
 			if(count($results) == 0) {
@@ -593,6 +634,10 @@
 			}
 			elseif(count($results) == 1) {
 				$results = $results[0];
+				
+				if($cacheSingleRowOnLoad && !empty(static::$_cachePrefix)) {
+					Cache::set(static::$_cachePrefix . $results->getId(), $lastRow);
+				}
 			}
 			
 			return $results;
@@ -600,11 +645,19 @@
 
 		/**
 		 * findById:
-		 * Performs a generic search based on the primary key field.
+		 * Performs a generic search based solely on the primary key field.
 		 */
 		public static function findById($id, $sort = false, $limitStart = false, $limitEnd = false)
 		{
-			return self::find(array(static::$_key_field => $id), $sort, $limitStart, $limitEnd);
+			if(!empty(static::$_cachePrefix)) {
+				$cacheResult = Cache::get(static::$_cachePrefix . $id);
+				if($cacheResult && is_array($cacheResult)) {
+					$className = get_called_class();
+					return new $className($cacheResult);
+				}
+			}
+			
+			return self::find(array(static::$_key_field => $id), $sort, $limitStart, $limitEnd, true);
 		}
 
 		/**

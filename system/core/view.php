@@ -17,6 +17,27 @@
 			$this->_variables[$variable] = $value;
 		}
 		
+		function hasAssigned($variable) {
+			return isset($this->_variables[$variable]);
+		}
+		
+		function getValue($variable) {
+			if($this->hasAssigned($variable)) {
+				return $this->_variables[$variable];
+			}
+			
+			return NULL;
+		}
+		
+		function viewFileExists($fileName)
+		{
+			if($fileName[0] != '/') {
+				$fileName = VIEW_ROOT .'/'. $fileName;
+			}
+			
+			return file_exists($fileName);
+		}
+		
 		function display($file = "")
 		{
 			if($file) {
