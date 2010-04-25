@@ -34,6 +34,7 @@
 	include(LIBRARY_ROOT.'/debug.php');
 	include(LIBRARY_ROOT.'/datetime.php');
 	include(LIBRARY_ROOT.'/database.php');
+	include(LIBRARY_ROOT.'/cache.php');
 	include(LIBRARY_ROOT.'/string.php');
 	include(LIBRARY_ROOT.'/array.php');
 	include(LIBRARY_ROOT.'/validation.php');
