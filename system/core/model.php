@@ -178,7 +178,8 @@
 				return;
 			}
 			
-			if(empty(static::$_field_types))
+			$cacheKey = static::$_table_name;
+			if(!isset(static::$_field_types[$cacheKey]))
 			{
 				$res = Database::query("SHOW COLUMNS IN `". static::$_table_name ."`");
 				
@@ -195,12 +196,12 @@
 					if($field_default == 'NULL')
 						$field_default = NULL;
 					
-					static::$_field_types[$field_name] = $field_type;
-					static::$_field_defaults[$field_name] = $field_default;
+					static::$_field_types[$cacheKey][$field_name] = $field_type;
+					static::$_field_defaults[$cacheKey][$field_name] = $field_default;
 				}
 			}
 
-			foreach(static::$_field_defaults as $fieldName => $defaultValue) {
+			foreach(static::$_field_defaults[$cacheKey] as $fieldName => $defaultValue) {
 				$this->$fieldName = $defaultValue;
 			}
 		}
