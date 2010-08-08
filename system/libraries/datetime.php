@@ -46,5 +46,3 @@
 		    return "$difference $periods[$j] {$tense}";
 		}
 	}
-
-?>

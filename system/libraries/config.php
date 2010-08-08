@@ -12,5 +12,3 @@
 			return $global[$key];
 		}
 	}
-
-?>

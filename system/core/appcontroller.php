@@ -13,5 +13,3 @@
 			parent::__destruct();
 		}
 	}
-	
-?>

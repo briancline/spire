@@ -41,5 +41,3 @@
 	 * [INFO] Movie name is 2001: A Space Odyssey
 	 *
 	 */
-	
-?>

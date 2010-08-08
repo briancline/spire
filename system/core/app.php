@@ -169,5 +169,3 @@
 				Database::close($this->db_conn);
 		}
 	}
-
-?>

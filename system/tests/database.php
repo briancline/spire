@@ -30,5 +30,3 @@
 	$new_id = $u->get_key_value();
 	$u2 = new User($new_id);
 	print_r($u2);
-	
-?>

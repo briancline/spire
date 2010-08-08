@@ -44,5 +44,3 @@
 		$global['db_pass'] = '';
 		$global['db_database'] = 'domain_dev';
 	}
-
-?>

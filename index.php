@@ -58,5 +58,3 @@
 	 */
 	$APP = new App();
 	$APP->dispatch();
-	
-?>

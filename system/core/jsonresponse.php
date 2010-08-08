@@ -11,5 +11,3 @@
 			$this->message = $message;
 		}
 	}
-	
-?>
