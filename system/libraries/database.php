@@ -4,17 +4,20 @@
 	{
 		public static $queryCount = 0;
 		
-		static function datetime($ts_or_date = -1, $secs_delta = 0)
+		static function datetime($tsOrDate = -1, $secs_delta = 0)
 		{
 			$format = 'Y-m-d H:i:s';
 			$ts = 0;
 			
-			if(is_numeric($ts_or_date))
-				$ts = $ts_or_date + $secs_delta;
-			elseif($ts_or_date != -1)
-				$ts = strtotime($ts_or_date) + $secs_delta;
-			else
+			if(is_numeric($tsOrDate)) {
+				$ts = $tsOrDate + $secs_delta;
+			}
+			elseif($tsOrDate != -1) {
+				$ts = strtotime($tsOrDate) + $secs_delta;
+			}
+			else {
 				$ts = time();
+			}
 			
 			return date($format, $ts);
 		}
@@ -24,8 +27,9 @@
 		{
 			$conn = mysql_connect($host, $user, $pass);
 			
-			if($conn && $database)
+			if($conn && $database) {
 				mysql_select_db($database, $conn);
+			}
 			
 			return $conn;
 		}
@@ -43,8 +47,7 @@
 			$err = mysql_errno();
 			self::$queryCount++;
 			
-			if($err != 0)
-			{
+			if($err != 0) {
 				Debug::trace("[QUERY] $query");
 				Debug::critical("[ERROR] ".
 					"I'm sorry, Dave, I'm afraid I can't do that. ".
@@ -52,15 +55,14 @@
 				error_log($query);
 				error_log(mysql_error());
 			}
-			elseif($log)
-			{
+			elseif($log) {
 				Debug::trace("[QUERY] $query");
 			}
 			
 			return $res;
 		}
 		
-		function query_record($query)
+		function queryRecord($query)
 		{
 			$res = Database::query($query);
 			$rec = mysql_fetch_assoc($res);
@@ -68,7 +70,7 @@
 			return $rec;
 		}
 		
-		function query_value($query, $col = 0)
+		function queryValue($query, $col = 0)
 		{
 			$res = Database::query($query);
 			$val = @mysql_result($res, $col);
@@ -76,24 +78,22 @@
 			return $val;
 		}
 		
-		function query_object($query)
+		function queryObject($query)
 		{
 			$res = Database::query($query);
 			return mysql_fetch_object($res);
 		}
 		
-		function query_id_array($query, $log = false)
+		function queryIdList($query, $log = false)
 		{
 			$res = Database::db_query($query, $log);
 			$err = mysql_errno();
 			$arr = false;
 			
-			if($res)
-			{
+			if($res) {
 				$arr = array();
 				
-				while($rec = mysql_fetch_array($res))
-				{
+				while($rec = mysql_fetch_array($res)) {
 					$arr[] = $rec[0];
 				}
 			}
@@ -101,38 +101,43 @@
 			return $arr;
 		}
 		
-		function insert_id($result = 0)
+		function getInsertId($result = 0)
 		{
-			if($result != 0)
+			if($result != 0) {
 				return mysql_insert_id($result);
-			else
+			}
+			else {
 				return mysql_insert_id();
+			}
 		}
 		
-		function num_rows($result)
+		function getRowCount($result)
 		{
 			return mysql_num_rows($result);
 		}
 		
-		function jumpToRow($result, $rowNum) {
+		function jumpToRow($result, $rowNum)
+		{
 			return mysql_data_seek($result, $rowNum);
 		}
 		
-		function fetch_assoc($result)
+		function fetchMap($result)
 		{
 			return mysql_fetch_assoc($result);
 		}
 		
-		function fetch_object($result)
+		function fetchObject($result)
 		{
 			return mysql_fetch_object($result);
 		}
 		
 		function close($conn = 0)
 		{
-			if($conn != 0)
+			if($conn != 0) {
 				mysql_close($conn);
-			else
+			}
+			else {
 				mysql_close();
+			}
 		}
 	}
