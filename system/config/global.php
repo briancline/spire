@@ -36,7 +36,7 @@
 	$global['is_dev_site'] = preg_match('#/sub/dev/#', dirname(__FILE__));
 	
 	// Set appropriate variables for test environment
-	if($global['is_dev_site']) {
+	if ($global['is_dev_site']) {
 		$global['domain_name'] = 'dev.domain.com';
 		$global['url'] = 'http://dev.domain.com/';
 		

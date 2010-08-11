@@ -10,10 +10,10 @@
 			$this->postVars = new stdClass();
 			$this->getVars = new stdClass();
 
-			foreach($_POST as $postKey => $postValue) {
+			foreach ($_POST as $postKey => $postValue) {
 				$this->postVars->$postKey = $postValue;
 			}
-			foreach($_GET as $getKey => $getValue) {
+			foreach ($_GET as $getKey => $getValue) {
 				$this->getVars->$getKey = $getValue;
 			}
 		}
@@ -50,20 +50,20 @@
 		
 		protected function getSiteUri($path = '', $subdomain = '', $isSecure = false)
 		{
-			if($subdomain != '') {
+			if ($subdomain != '') {
 				$uri = 'http://'. $subdomain .'.'. Config::get('domain_name');
 			}
 			else {
 				$uri = Config::get('url');
 			}
 
-			if($isSecure) {
+			if ($isSecure) {
 				$uri = preg_replace('/^http:/https:/i', $uri);
 			}
 			
 			// Avoid double-slashes between the root URI and the path.
 			$uriLength = strlen($uri);
-			if($uri[$uriLength - 1] == '/' && strlen($path) > 0 && $path[0] == '/') {
+			if ($uri[$uriLength - 1] == '/' && strlen($path) > 0 && $path[0] == '/') {
 				$path = substr($path, 1);
 			}
 			
@@ -79,12 +79,12 @@
 		{
 			$obj = json_decode($_POST[$req_field_name]);
 			
-			if(!is_object($obj))
+			if (!is_object($obj))
 				return false;
 			
-			foreach(get_object_vars($obj) as $name => $value)
+			foreach (get_object_vars($obj) as $name => $value)
 			{
-				if(is_string($value))
+				if (is_string($value))
 					$value = trim($value);
 				
 				$obj->$name = $value;
@@ -99,7 +99,7 @@
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			
-			if($req != '') {
+			if ($req != '') {
 				$req = json_encode($req);
 				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $req_field_name .'='. urlencode($req));

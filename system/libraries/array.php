@@ -4,7 +4,7 @@
 	{
 		static public function fromSingleton($input)
 		{
-			if(!is_array($input)) {
+			if (!is_array($input)) {
 				$input = array($input);
 			}
 			
@@ -13,7 +13,7 @@
 		
 		static public function fromSingletonIfNotNull($input)
 		{
-			if($input) {
+			if ($input) {
 				$input = self::fromSingleton($input);
 			}
 			

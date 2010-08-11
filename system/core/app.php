@@ -31,7 +31,7 @@
 			
 			$this->db_conn = Database::connect($host, $user, $pass, $database);
 			
-			if(Config::get('memcache_enabled')) {
+			if (Config::get('memcache_enabled')) {
 				$this->memcache = new Memcache;
 				$this->memcache->pconnect(
 					Config::get('memcache_host'),
@@ -70,26 +70,26 @@
 		 */
 		function prepare_request()
 		{
-			if(isset($_SERVER['PATH_INFO'])) {
+			if (isset($_SERVER['PATH_INFO'])) {
 				$this->request = $_SERVER['PATH_INFO'];
 			}
 			else {
 				$this->request = $_SERVER['REQUEST_URI'];
 			}
 			
-			if($this->request && !preg_match(Config::get('url_chars'), $this->request)) {
+			if ($this->request && !preg_match(Config::get('url_chars'), $this->request)) {
 				return false;
 			}
 			
 			// Remove the length of the query string off the end of the
 			// request. +1 to the query string length to also remove the ?
 			$this->query_string = $_SERVER['QUERY_STRING'];
-			if(!empty($this->query_string) && false !== strpos($this->request, '?')) {
+			if (!empty($this->query_string) && false !== strpos($this->request, '?')) {
 				$this->request = substr($this->request, 0, (strlen($this->query_string) + 1) * -1);
 			}
 			
 			// Trash any leading slashes
-			if($this->request[0] == '/') {
+			if ($this->request[0] == '/') {
 				$this->request = substr($this->request, 1);
 			}
 			
@@ -100,7 +100,7 @@
 			$this->request_length = count($this->request);
 			
 			// Trash the index.php match
-			if($this->request[0] == 'index.php') {
+			if ($this->request[0] == 'index.php') {
 				array_shift($this->request);
 			}
 			
@@ -109,11 +109,11 @@
 			$this->request_method = array_shift($this->request);
 			$this->request_arguments = $this->request;
 			
-			if(!$this->request_controller) {
+			if (!$this->request_controller) {
 				$this->request_controller = Config::get('default_controller');
 			}
 			
-			if(!$this->request_method) {
+			if (!$this->request_method) {
 				$this->request_method = Config::get('default_method');
 			}
 			
@@ -127,12 +127,12 @@
 		function dispatch()
 		{
 			// Don't bother dispatching if we run from CLI
-			if(empty($_SERVER['REQUEST_URI'])) {
+			if (empty($_SERVER['REQUEST_URI'])) {
 				return;
 			}
 			
 			// Prepare the request before attempting to dispatch.
-			if(!$this->prepare_request()) {
+			if (!$this->prepare_request()) {
 				die("Could not properly prepare the request.");
 			}
 			
@@ -140,7 +140,7 @@
 			$method = $this->request_method;
 			$class_file = CONTROLLER_ROOT.'/'.$class.'.php';
 			
-			if(!file_exists($class_file)) {
+			if (!file_exists($class_file)) {
 				header($_SERVER['SERVER_PROTOCOL'] .' 404 Not Found');
 				die("Controller [$class] does not exist.");
 			}
@@ -155,7 +155,7 @@
 			 * the ability to intercept and handle missing methods. Don't die
 			 * if we can't find the method in a controller where __call is defined.
 			 */
-			if((!method_exists($obj, $method) && !method_exists($obj, '__call')) || !is_callable(array($obj, $method))) {
+			if ((!method_exists($obj, $method) && !method_exists($obj, '__call')) || !is_callable(array($obj, $method))) {
 				header($_SERVER['SERVER_PROTOCOL'] .' 404 Not Found');
 				die("Controller method [$class][$method] does not exist.");
 			}
@@ -165,7 +165,7 @@
 		
 		function __destruct()
 		{
-			if($this->db_conn)
+			if ($this->db_conn)
 				Database::close($this->db_conn);
 		}
 	}

@@ -9,10 +9,10 @@
 			$format = 'Y-m-d H:i:s';
 			$ts = 0;
 			
-			if(is_numeric($tsOrDate)) {
+			if (is_numeric($tsOrDate)) {
 				$ts = $tsOrDate + $secs_delta;
 			}
-			elseif($tsOrDate != -1) {
+			elseif ($tsOrDate != -1) {
 				$ts = strtotime($tsOrDate) + $secs_delta;
 			}
 			else {
@@ -27,7 +27,7 @@
 		{
 			$conn = mysql_connect($host, $user, $pass);
 			
-			if($conn && $database) {
+			if ($conn && $database) {
 				mysql_select_db($database, $conn);
 			}
 			
@@ -47,7 +47,7 @@
 			$err = mysql_errno();
 			self::$queryCount++;
 			
-			if($err != 0) {
+			if ($err != 0) {
 				Debug::trace("[QUERY] $query");
 				Debug::critical("[ERROR] ".
 					"I'm sorry, Dave, I'm afraid I can't do that. ".
@@ -55,7 +55,7 @@
 				error_log($query);
 				error_log(mysql_error());
 			}
-			elseif($log) {
+			elseif ($log) {
 				Debug::trace("[QUERY] $query");
 			}
 			
@@ -90,10 +90,10 @@
 			$err = mysql_errno();
 			$arr = false;
 			
-			if($res) {
+			if ($res) {
 				$arr = array();
 				
-				while($rec = mysql_fetch_array($res)) {
+				while ($rec = mysql_fetch_array($res)) {
 					$arr[] = $rec[0];
 				}
 			}
@@ -103,7 +103,7 @@
 		
 		function getInsertId($result = 0)
 		{
-			if($result != 0) {
+			if ($result != 0) {
 				return mysql_insert_id($result);
 			}
 			else {
@@ -133,7 +133,7 @@
 		
 		function close($conn = 0)
 		{
-			if($conn != 0) {
+			if ($conn != 0) {
 				mysql_close($conn);
 			}
 			else {

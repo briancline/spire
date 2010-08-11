@@ -8,7 +8,7 @@
 	
 	class Debug
 	{
-		static $log_level = 0x0f; // Log everything by default
+		static $logLevel = 0x0f; // Log everything by default
 		
 		
 		function __construct()
@@ -17,28 +17,28 @@
 		}
 		
 		
-		function set_level($level)
+		function setLevel($level)
 		{
-			Debug::$log_level = $level;
+			Debug::$logLevel = $level;
 		}
 		
 		
-		function hide_level($level)
+		function hideLevel($level)
 		{
-			if(Debug::is_logging($level))
-				Debug::$log_level &= ~$level;
+			if (Debug::isLogging($level))
+				Debug::$logLevel &= ~$level;
 		}
 		
 		
-		function is_logging($level)
+		function isLogging($level)
 		{
-			return (Debug::$log_level & $level) == $level;
+			return (Debug::$logLevel & $level) == $level;
 		}
 		
 		
 		static function critical($format)
 		{
-			if(!Debug::is_logging(DEBUG_CRITICAL))
+			if (!Debug::isLogging(DEBUG_CRITICAL))
 				return false;
 				
 			$arguments = func_get_args();
@@ -46,13 +46,13 @@
 			
 			$message = vsprintf($format, $arguments);
 			
-			Debug::log_to_screen('CRIT', $message);
+			Debug::logToScreen('CRIT', $message);
 		}
 		
 		
 		static function warn($format)
 		{
-			if(!Debug::is_logging(DEBUG_WARN))
+			if (!Debug::isLogging(DEBUG_WARN))
 				return false;
 				
 			$arguments = func_get_args();
@@ -60,13 +60,13 @@
 			
 			$message = vsprintf($format, $arguments);
 			
-			Debug::log_to_screen('WARN', $message);
+			Debug::logToScreen('WARN', $message);
 		}
 		
 		
 		static function info($format)
 		{
-			if(!Debug::is_logging(DEBUG_INFO))
+			if (!Debug::isLogging(DEBUG_INFO))
 				return false;
 				
 			$arguments = func_get_args();
@@ -74,13 +74,13 @@
 			
 			$message = vsprintf($format, $arguments);
 			
-			Debug::log_to_screen('INFO', $message);
+			Debug::logToScreen('INFO', $message);
 		}
 		
 		
 		static function trace($format)
 		{
-			if(!Debug::is_logging(DEBUG_TRACE))
+			if (!Debug::isLogging(DEBUG_TRACE))
 				return false;
 			
 			$arguments = func_get_args();
@@ -88,22 +88,20 @@
 			
 			$message = vsprintf($format, $arguments);
 			
-			Debug::log_to_screen('TRACE', $message);
+			Debug::logToScreen('TRACE', $message);
 		}
 		
 		
-		static function log_to_screen($level_name, $message)
+		static function logToScreen($levelName, $message)
 		{
-			$is_cli = (php_sapi_name() == 'cli');
-			$class_name = strtolower($level_name);
+			$isCli = (php_sapi_name() == 'cli');
+			$className = strtolower($levelName);
 			
-			if($is_cli)
-			{
-				printf("[%s] %s\n", $level_name, $message);
+			if ($isCli) {
+				printf("[%s] %s\n", $levelName, $message);
 			}
-			else
-			{
-				printf('<div class="debug debug_%s">[%s] %s</div>%s', $class_name, $level_name, $message, "\n");
+			else {
+				printf('<div class="debug debug_%s">[%s] %s</div>%s', $className, $levelName, $message, "\n");
 			}
 		}
 	}

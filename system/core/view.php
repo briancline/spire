@@ -22,7 +22,7 @@
 		}
 		
 		function getValue($variable) {
-			if($this->hasAssigned($variable)) {
+			if ($this->hasAssigned($variable)) {
 				return $this->_variables[$variable];
 			}
 			
@@ -31,7 +31,7 @@
 		
 		function viewFileExists($fileName)
 		{
-			if($fileName[0] != '/') {
+			if ($fileName[0] != '/') {
 				$fileName = VIEW_ROOT .'/'. $fileName;
 			}
 			
@@ -40,19 +40,19 @@
 		
 		function display($file = "")
 		{
-			if($file) {
+			if ($file) {
 				$this->_file = $file;
 			}
 			
-			if(!preg_match('/\.(php|html|tpl|tmpl)$/i', $this->_file)) {
+			if (!preg_match('/\.(php|html|tpl|tmpl)$/i', $this->_file)) {
 				$this->_file .= '.php';
 			}
 			
 			$file_path = $this->_root .'/'. $this->_file;
 			
-			if(file_exists($file_path))
+			if (file_exists($file_path))
 			{
-				foreach($this->_variables as $key => $value) {
+				foreach ($this->_variables as $key => $value) {
 					$$key = $value;
 				}
 				

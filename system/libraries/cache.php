@@ -13,7 +13,7 @@
 		public static $prefix = '';
 		
 		public static function get($key) {
-			if(!self::$cache) {
+			if (!self::$cache) {
 				return false;
 			}
 
@@ -22,7 +22,7 @@
 		}
 		
 		public static function dirty($key) {
-			if(!self::$cache) {
+			if (!self::$cache) {
 				return false;
 			}
 
@@ -31,7 +31,7 @@
 		}
 		
 		public static function set($key, $value, $expiration = 0) {
-			if(!self::$cache) {
+			if (!self::$cache) {
 				return false;
 			}
 
@@ -39,7 +39,7 @@
 			return self::$cache->set(self::$prefix . $key, $value, 0, $expiration);
 		}
 		public static function setCompressed($key, $value, $expiration = 0) {
-			if(!self::$cache) {
+			if (!self::$cache) {
 				return false;
 			}
 

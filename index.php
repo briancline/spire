@@ -46,9 +46,9 @@
 		$model_path = MODEL_ROOT.'/'.$class_name.'.php';
 		$lib_path = LIBRARY_ROOT.'/'.$class_name.'.php';
 		
-		if(Config::get('library_auto_discovery') && file_exists($lib_path))
+		if (Config::get('library_auto_discovery') && file_exists($lib_path))
 			include($lib_path);
-		elseif(Config::get('model_auto_discovery') && file_exists($model_path))
+		elseif (Config::get('model_auto_discovery') && file_exists($model_path))
 			include($model_path);
 	}
 	
