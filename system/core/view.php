@@ -6,14 +6,12 @@
 		private $_file;
 		private $_variables = array();
 		
-		function __construct($file = "")
-		{
+		function __construct($file = '') {
 			$this->_root = VIEW_ROOT;
 			$this->_file = $file;
 		}
 		
-		function assign($variable, $value)
-		{
+		function assign($variable, $value) {
 			$this->_variables[$variable] = $value;
 		}
 		
@@ -38,8 +36,7 @@
 			return file_exists($fileName);
 		}
 		
-		function display($file = "")
-		{
+		function display($file = '') {
 			if ($file) {
 				$this->_file = $file;
 			}
@@ -48,18 +45,16 @@
 				$this->_file .= '.php';
 			}
 			
-			$file_path = $this->_root .'/'. $this->_file;
+			$filePath = $this->_root .'/'. $this->_file;
 			
-			if (file_exists($file_path))
-			{
+			if (file_exists($filePath)) {
 				foreach ($this->_variables as $key => $value) {
 					$$key = $value;
 				}
 				
-				include($file_path);
+				include($filePath);
 			}
-			else
-			{
+			else {
 				Debug::critical('View %s does not exist.', $this->_file);
 			}
 		}

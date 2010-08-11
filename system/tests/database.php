@@ -27,6 +27,6 @@
 	$u->password = md5('doh');
 	$u->save();
 	
-	$new_id = $u->get_key_value();
+	$new_id = $u->getKeyValue();
 	$u2 = new User($new_id);
 	print_r($u2);

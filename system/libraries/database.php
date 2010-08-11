@@ -4,16 +4,16 @@
 	{
 		public static $queryCount = 0;
 		
-		static function datetime($tsOrDate = -1, $secs_delta = 0)
+		static function datetime($tsOrDate = -1, $secsDelta = 0)
 		{
 			$format = 'Y-m-d H:i:s';
 			$ts = 0;
 			
 			if (is_numeric($tsOrDate)) {
-				$ts = $tsOrDate + $secs_delta;
+				$ts = $tsOrDate + $secsDelta;
 			}
 			elseif ($tsOrDate != -1) {
-				$ts = strtotime($tsOrDate) + $secs_delta;
+				$ts = strtotime($tsOrDate) + $secsDelta;
 			}
 			else {
 				$ts = time();

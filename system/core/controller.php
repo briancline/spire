@@ -75,9 +75,9 @@
 		/********************************************************************************
 		 *** POST-BASED JSON METHODS ****************************************************
 		 ********************************************************************************/
-		protected function getJsonPostRequest($req_field_name = 'request')
+		protected function getJsonPostRequest($reqFieldName = 'request')
 		{
-			$obj = json_decode($_POST[$req_field_name]);
+			$obj = json_decode($_POST[$reqFieldName]);
 			
 			if (!is_object($obj))
 				return false;
@@ -93,7 +93,7 @@
 			return $obj;
 		}
 		
-		protected function sendJsonRequest($url, $req = '', $req_field_name = 'request')
+		protected function sendJsonRequest($url, $req = '', $reqFieldName = 'request')
 		{
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -102,7 +102,7 @@
 			if ($req != '') {
 				$req = json_encode($req);
 				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $req_field_name .'='. urlencode($req));
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $reqFieldName .'='. urlencode($req));
 			}
 			
 			$resp = curl_exec($ch);

@@ -2,7 +2,7 @@
 
 	class StringUtils
 	{
-		function url_encode($str)
+		function urlEncode($str)
 		{
 			//$str = urlencode($str);
 			$str = str_replace("\r", '%0D', $str);

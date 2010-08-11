@@ -40,16 +40,18 @@
 	include(LIBRARY_ROOT.'/validation.php');
 	
 	// Include models as they are required
-	function __autoload($class_name)
+	function __autoload($className)
 	{
-		$class_name = strtolower($class_name);
-		$model_path = MODEL_ROOT.'/'.$class_name.'.php';
-		$lib_path = LIBRARY_ROOT.'/'.$class_name.'.php';
+		$className = strtolower($className);
+		$modelPath = MODEL_ROOT.'/'.$className.'.php';
+		$libPath = LIBRARY_ROOT.'/'.$className.'.php';
 		
-		if (Config::get('library_auto_discovery') && file_exists($lib_path))
-			include($lib_path);
-		elseif (Config::get('model_auto_discovery') && file_exists($model_path))
-			include($model_path);
+		if (Config::get('library_auto_discovery') && file_exists($libPath)) {
+			include($libPath);
+		}
+		elseif (Config::get('model_auto_discovery') && file_exists($modelPath)) {
+			include($modelPath);
+		}
 	}
 	
 	

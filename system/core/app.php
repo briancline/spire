@@ -3,24 +3,24 @@
 	class App
 	{
 		// Global and database config
-		private $global_config;
-		private $db_config;
+		private $globalConfig;
+		private $dbConfig;
 		
 		// Database connection
-		private $db_conn;
+		private $dbConnection;
 		
 		// Memcached connection
-		private $memcache;
+		private $memcacheConnection;
 		
 		// Request URI
 		private $request;
-		private $request_length;
-		private $request_controller;
-		private $request_method;
-		private $request_arguments;
+		private $requestLength;
+		private $requestController;
+		private $requestMethod;
+		private $requestArguments;
 		
 		// Query string
-		private $query_string;
+		private $queryString;
 		
 		function __construct()
 		{
@@ -29,14 +29,14 @@
 			$pass = Config::get('db_pass');
 			$database = Config::get('db_database');
 			
-			$this->db_conn = Database::connect($host, $user, $pass, $database);
+			$this->dbConnection = Database::connect($host, $user, $pass, $database);
 			
 			if (Config::get('memcache_enabled')) {
-				$this->memcache = new Memcache;
-				$this->memcache->pconnect(
+				$this->memcacheConnection = new Memcache;
+				$this->memcacheConnection->pconnect(
 					Config::get('memcache_host'),
 					Config::get('memcache_port'));
-				Cache::$cache = $this->memcache;
+				Cache::$cache = $this->memcacheConnection;
 				Cache::$prefix = Config::get('memcache_prefix');
 			}
 		}
@@ -68,7 +68,7 @@
 		 *  If no controller is provided, we default to $global['default_controller'] and
 		 *  if no method is provided, we default to $global['default_method']
 		 */
-		function prepare_request()
+		function prepareRequest()
 		{
 			if (isset($_SERVER['PATH_INFO'])) {
 				$this->request = $_SERVER['PATH_INFO'];
@@ -83,9 +83,9 @@
 			
 			// Remove the length of the query string off the end of the
 			// request. +1 to the query string length to also remove the ?
-			$this->query_string = $_SERVER['QUERY_STRING'];
-			if (!empty($this->query_string) && false !== strpos($this->request, '?')) {
-				$this->request = substr($this->request, 0, (strlen($this->query_string) + 1) * -1);
+			$this->queryString = $_SERVER['QUERYString'];
+			if (!empty($this->queryString) && false !== strpos($this->request, '?')) {
+				$this->request = substr($this->request, 0, (strlen($this->queryString) + 1) * -1);
 			}
 			
 			// Trash any leading slashes
@@ -97,7 +97,7 @@
 			$this->request = Routing::determineFinalRoute($this->request);
 			
 			$this->request = explode('/', $this->request);
-			$this->request_length = count($this->request);
+			$this->requestLength = count($this->request);
 			
 			// Trash the index.php match
 			if ($this->request[0] == 'index.php') {
@@ -105,16 +105,16 @@
 			}
 			
 			// Grab the controller, method and arguments
-			$this->request_controller = array_shift($this->request);
-			$this->request_method = array_shift($this->request);
-			$this->request_arguments = $this->request;
+			$this->requestController = array_shift($this->request);
+			$this->requestMethod = array_shift($this->request);
+			$this->requestArguments = $this->request;
 			
-			if (!$this->request_controller) {
-				$this->request_controller = Config::get('default_controller');
+			if (!$this->requestController) {
+				$this->requestController = Config::get('default_controller');
 			}
 			
-			if (!$this->request_method) {
-				$this->request_method = Config::get('default_method');
+			if (!$this->requestMethod) {
+				$this->requestMethod = Config::get('default_method');
 			}
 			
 			return true;
@@ -132,12 +132,12 @@
 			}
 			
 			// Prepare the request before attempting to dispatch.
-			if (!$this->prepare_request()) {
+			if (!$this->prepareRequest()) {
 				die("Could not properly prepare the request.");
 			}
 			
-			$class = $this->request_controller;
-			$method = $this->request_method;
+			$class = $this->requestController;
+			$method = $this->requestMethod;
 			$class_file = CONTROLLER_ROOT.'/'.$class.'.php';
 			
 			if (!file_exists($class_file)) {
@@ -160,12 +160,13 @@
 				die("Controller method [$class][$method] does not exist.");
 			}
 			
-			call_user_func_array(array($obj, $method), $this->request_arguments);
+			call_user_func_array(array($obj, $method), $this->requestArguments);
 		}
 		
 		function __destruct()
 		{
-			if ($this->db_conn)
-				Database::close($this->db_conn);
+			if ($this->dbConnection) {
+				Database::close($this->dbConnection);
+			}
 		}
 	}

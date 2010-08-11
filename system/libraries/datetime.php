@@ -16,20 +16,20 @@
 		    $lengths         = array("60","60","24","7","4.35","12","10");
 		    
 		    $now             = time();
-		    $unix_date         = strtotime($date);
+		    $unixDate        = strtotime($date);
 		    
 		       // check validity of date
-		    if (empty($unix_date)) {    
+		    if (empty($unixDate)) {    
 		        return "Bad date";
 		    }
 		
 		    // is it future date or past date
-		    if ($now > $unix_date) {    
-		        $difference     = $now - $unix_date;
+		    if ($now > $unixDate) {    
+		        $difference     = $now - $unixDate;
 		        $tense         = "ago";
 		        
 		    } else {
-		        $difference     = $unix_date - $now;
+		        $difference     = $unixDate - $now;
 		        $tense         = "from now";
 		    }
 		    

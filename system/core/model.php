@@ -551,7 +551,7 @@
 		{
 			$q = "SELECT * FROM `". static::$_tableName ."`";
 			
-			$where_bits = array();
+			$whereBits = array();
 			foreach ($criteria as $column => $value) {
 				$operand = '=';
 				if (preg_match('/^(.+):(.+)$/', $column, $bits)) {
@@ -569,11 +569,11 @@
 				}
 				
 				$value = addslashes($value);
-				$where_bits[] = "`$column` $operand '$value'";
+				$whereBits[] = "`$column` $operand '$value'";
 			}
 			
-			if (!empty($where_bits)) {
-				$q .= " WHERE ". implode(' AND ', $where_bits);
+			if (!empty($whereBits)) {
+				$q .= " WHERE ". implode(' AND ', $whereBits);
 			}
 			
 			if ($sort && !is_array($sort)) {
@@ -581,7 +581,7 @@
 			}
 			
 			if ($sort) {
-				$sort_bits = array();
+				$sortBits = array();
 				foreach ($sort as $field) {
 					if (preg_match('/^(.*):(.*)$/', $field, $bits)) {
 						$order = strtoupper($bits[2]);
@@ -595,10 +595,10 @@
 						$field = "`$field`";
 					}
 					
-					$sort_bits[] = $field;
+					$sortBits[] = $field;
 				}
 				
-				$q .= ' ORDER BY '. implode(', ', $sort_bits);
+				$q .= ' ORDER BY '. implode(', ', $sortBits);
 			}
 			
 			if ($limitStart !== false && is_numeric($limitStart)) {
