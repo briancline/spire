@@ -4,10 +4,8 @@
 	{
 		public function index()
 		{
-			$v = new View('home.index.php');
+			$v = new View('home.index');
 			$v->display();
 		}
 
 	}
-
-

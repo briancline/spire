@@ -6,14 +6,15 @@
 	define('ROOT', dirname(__FILE__));
 
 	// System paths
-	define('CONFIG_ROOT', ROOT.'/system/config');
-	define('CORE_ROOT', ROOT.'/system/core');
-	define('LIBRARY_ROOT', ROOT.'/system/libraries');
+	define('SYS_ROOT',        ROOT.'/system');
+	define('CONFIG_ROOT',     SYS_ROOT.'/config');
+	define('CORE_ROOT',       SYS_ROOT.'/core');
+	define('LIBRARY_ROOT',    SYS_ROOT.'/libraries');
 	
 	// Application paths
-	define('CONTROLLER_ROOT', ROOT.'/system/controllers');
-	define('MODEL_ROOT', ROOT.'/system/models');
-	define('VIEW_ROOT', ROOT.'/system/views');
+	define('CONTROLLER_ROOT', SYS_ROOT.'/controllers');
+	define('MODEL_ROOT',      SYS_ROOT.'/models');
+	define('VIEW_ROOT',       SYS_ROOT.'/views');
 	
 	// Include global and database configuration
 	include(CONFIG_ROOT.'/global.php');

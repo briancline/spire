@@ -79,13 +79,14 @@
 		{
 			$obj = json_decode($_POST[$reqFieldName]);
 			
-			if (!is_object($obj))
+			if (!is_object($obj)) {
 				return false;
+			}
 			
-			foreach (get_object_vars($obj) as $name => $value)
-			{
-				if (is_string($value))
+			foreach (get_object_vars($obj) as $name => $value) {
+				if (is_string($value)) {
 					$value = trim($value);
+				}
 				
 				$obj->$name = $value;
 			}

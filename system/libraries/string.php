@@ -1,7 +1,32 @@
 <?php
-
+	
+	/**
+	 * E:
+	 * Return a string with all special HTML entities safely encoded.
+	 */
+	function E($string) {
+		return htmlentities(htmlspecialchars($string));
+	}
+	
+	/**
+	 * EN:
+	 * Return a string in the same fashion as E() but with line breaks
+	 * represented as <br /> tags.
+	 */
+	function EN($string) {
+		return nl2br(E($string));
+	}
+	
+	
 	class StringUtils
 	{
+		/**
+		 * urlEncode: returns a URL-encoded representation of the input string.
+		 * PHP's built-in urlencode() was not entirely suitable for some 
+		 * reason...so add things here as needed.
+		 *
+		 * TODO: This is odd and seemingly app-specific. Rethink and rework.
+		 */
 		function urlEncode($str)
 		{
 			//$str = urlencode($str);
