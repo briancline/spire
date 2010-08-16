@@ -83,7 +83,7 @@
 			
 			// Remove the length of the query string off the end of the
 			// request. +1 to the query string length to also remove the ?
-			$this->queryString = $_SERVER['QUERYString'];
+			$this->queryString = $_SERVER['QUERY_STRING'];
 			if (!empty($this->queryString) && false !== strpos($this->request, '?')) {
 				$this->request = substr($this->request, 0, (strlen($this->queryString) + 1) * -1);
 			}
