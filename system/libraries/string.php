@@ -5,7 +5,7 @@
 	 * Return a string with all special HTML entities safely encoded.
 	 */
 	function E($string) {
-		return htmlentities(htmlspecialchars($string));
+		return htmlspecialchars($string, ENT_COMPAT, 'UTF-8');
 	}
 	
 	/**

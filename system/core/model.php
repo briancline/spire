@@ -120,8 +120,8 @@
 			return (
 				   $fieldName[0] == '_' 
 				|| in_array($fieldName, $checkArray) 
-				|| $field == static::$_updateTimestampField 
-				|| $field == static::$_insertTimestampField
+				|| $fieldName == static::$_updateTimestampField 
+				|| $fieldName == static::$_insertTimestampField
 			);
 		}
 		
@@ -336,7 +336,7 @@
 						$list .= ', ';
 					}
 					
-					$list .= "`$field` = '". addslashes($value) ."'";
+					$list .= "`$fieldName` = '". addslashes($value) ."'";
 				}
 			}
 			
@@ -361,7 +361,7 @@
 						$list .= ', ';
 					}
 					
-					$list .= "`$field`";
+					$list .= "`$fieldName`";
 				}
 			}
 			
@@ -669,7 +669,7 @@
 		 * Passes the request to find() and returns the result as an array of objects,
 		 * even if there is only one. If no results were returned, return an empty array.
 		 */
-		public static function findSet($criteria = array(), $sort = false, $limitStart = alse, $limitEnd = false)
+		public static function findSet($criteria = array(), $sort = false, $limitStart = false, $limitEnd = false)
 		{
 			$results = self::find($criteria, $sort, $limitStart, $limitEnd);
 
