@@ -255,8 +255,9 @@
 		 */
 		function fillFromPost()
 		{
+			$cacheKey = static::$_tableName;
 			foreach ($_POST as $fieldName => $fieldValue) {
-				if (array_key_exists($fieldName, static::$_fieldTypes)) {
+				if (array_key_exists($fieldName, static::$_fieldTypes[$cacheKey])) {
 					$this->$fieldName = $fieldValue;
 				}
 			}
@@ -302,7 +303,8 @@
 		 */
 		function resetMissingEnumValues($assoc)
 		{
-			foreach (static::$_fieldTypes as $fieldName => $type) {
+			$cacheKey = static::$_tableName;
+			foreach (static::$_fieldTypes[$cacheKey] as $fieldName => $type) {
 				$checkName = $fieldName;
 				
 				// Skip any non-enum columns
@@ -314,7 +316,7 @@
 					continue;
 				}
 					
-				$this->$fieldName = static::$_fieldDefaults[$fieldName];
+				$this->$fieldName = static::$_fieldDefaults[$cacheKey][$fieldName];
 			}
 		}
 		
