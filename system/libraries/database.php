@@ -9,7 +9,7 @@
 			$format = 'Y-m-d H:i:s';
 			$ts = 0;
 			
-			if (is_numeric($tsOrDate)) {
+			if (is_numeric($tsOrDate) && $tsOrDate >= 0) {
 				$ts = $tsOrDate + $secsDelta;
 			}
 			elseif ($tsOrDate != -1) {
